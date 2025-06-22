@@ -1,0 +1,24 @@
+# Ignore common Python stuff
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.env*/
+*.venv/
+.venv/
+
+# Jupyter and IPython
+.ipynb_checkpoints/
+*.ipynb
+
+# VSCode and PyCharm
+.vscode/
+.idea/
+
+# MacOS and system files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,52 @@
+_format_version: "2.1"
+
+# An Upstream is a group of targets that Kong will route traffic to.
+# Targets are the actual services that will receive the traffic.
+
+upstreams:
+- name: fastapi_upstream
+  algorithm: round-robin # Load balancing algorithm
+  healthchecks:
+
+    active:
+      type: http         # HTTP health check
+      http_path: /health # path to probe
+      healthy:
+        interval: 10           # seconds between probes when target is healthy
+        successes: 1          # of consecutive successes to mark healthy
+        http_statuses: [200]  # which status codes count as success
+      unhealthy:
+        interval: 5           # seconds between probes when target is unhealthy
+        http_failures: 1      # of HTTP errors to mark unhealthy
+
+  targets:
+  - target: app1:8000
+  - target: app2:8000
+  - target: app3:8000
+
+# To have each app under its own service. Each service will can be accessed via http://localhost:8000/<app_name>
+services:
+- name: app1-service
+  url: http://app1:8000
+  routes:
+  - name: app1-route
+    paths: ["/app1"]
+
+- name: app2-service
+  url: http://app2:8000
+  routes:
+  - name: app2-route
+    paths: ["/app2"]
+
+- name: app3-service
+  url: http://app3:8000
+  routes:
+  - name: app3-route
+    paths: ["/app3"]
+
+- name: generic-service
+  url: http://fastapi_upstream
+  routes:
+  - name: generic-route
+    paths: ["/"]
+    strip_path: false
