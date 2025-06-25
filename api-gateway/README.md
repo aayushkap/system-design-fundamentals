@@ -1,0 +1,1 @@
+This showcases Kong API Dateway With Round Robin or Least Connection Load Balancing. The LB method can be condifgured in the `docker-compose.yml` file.
