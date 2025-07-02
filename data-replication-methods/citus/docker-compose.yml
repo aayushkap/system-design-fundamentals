@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  # REPLICATION SETUP (Primary + Replica)
+  pg-primary:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: demo
+    volumes:
+      - pg-primary-data:/var/lib/postgresql/data # Use persistent volume
+      - ./replication/primary:/docker-entrypoint-initdb.d # Only init scripts
+    ports:
+      - "5432:5432"
+    networks:
+      - db-network
+
+  pg-replica:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - ./replication/replica/init.sh:/docker-entrypoint-initdb.d/init.sh
+    depends_on:
+      - pg-primary
+    networks:
+      - db-network
+    command: >
+      bash -c '
+      if [ ! -f /var/lib/postgresql/data/postgresql.conf ]; then
+        until pg_isready -h pg-primary; do sleep 2; done;
+        export PGPASSWORD=rep_pass;
+        pg_basebackup -h pg-primary -U replicator -D /var/lib/postgresql/data -P -R -X stream;
+      fi;
+      exec docker-entrypoint.sh postgres'
+
+  # SHARDING SETUP (Citus Cluster)
+  citus-worker1:
+    image: citusdata/citus:11.2
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - ./sharding/worker:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  citus-worker2:
+    image: citusdata/citus:11.2
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - ./sharding/worker:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  citus-coordinator:
+    image: citusdata/citus:11.2
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - ./sharding/coordinator:/docker-entrypoint-initdb.d
+    depends_on:
+      citus-worker1:
+        condition: service_healthy
+      citus-worker2:
+        condition: service_healthy
+
+volumes:
+  pg-primary-data:
+
+networks:
+  db-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

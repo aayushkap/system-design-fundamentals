@@ -1,0 +1,179 @@
+services:
+  # ─── Topology & Control ───
+  zk:
+    image: zookeeper:3.6
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888
+    ports: ["2181:2181"]
+
+  vtctld:
+    image: vitess/vtctld:v20.0.4-bullseye
+    user: "1000:1000"
+    depends_on: [zk]
+    ports: ["15000:15000"]
+    entrypoint: ["/vt/bin/vtctld"]
+    command:
+      - "--topo_implementation=zk2"
+      - "--topo_global_server_address=zk:2181"
+      - "--topo_global_root=/vitess/global"
+      - "--cell=zone1"
+      - "--logtostderr"
+
+  vtgate:
+    image: vitess/vtgate:v20.0.4-bullseye
+    user: "1000:1000"
+    depends_on: [vtctld]
+    ports:
+      - "15306:15306"
+      - "15001:15001"
+      - "15002:15002"
+    entrypoint: ["/vt/bin/vtgate"]
+    command:
+      - "--topo_implementation=zk2"
+      - "--topo_global_server_address=zk:2181"
+      - "--topo_global_root=/vitess/global"
+      - "--cell=zone1"
+      - "--port=15306"
+      - "--grpc_port=15001"
+      - "--tablet_types_to_wait=PRIMARY,REPLICA"
+      - "--logtostderr"
+
+  # ─── Shard1 MySQL ───
+  mysql-s1-primary:
+    image: mysql:8.0
+    command: ["--defaults-file=/etc/mysql/conf.d/shard1-primary.cnf"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./cnf/shard1-primary.cnf:/etc/mysql/conf.d/shard1-primary.cnf:ro
+    ports: ["33061:3306"]
+
+  mysql-s1-replica:
+    image: mysql:8.0
+    command: ["--defaults-file=/etc/mysql/conf.d/shard1-replica.cnf"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./cnf/shard1-replica.cnf:/etc/mysql/conf.d/shard1-replica.cnf:ro
+    ports: ["33062:3306"]
+
+  # ─── Shard2 MySQL ───
+  mysql-s2-primary:
+    image: mysql:8.0
+    command: ["--defaults-file=/etc/mysql/conf.d/shard2-primary.cnf"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./cnf/shard2-primary.cnf:/etc/mysql/conf.d/shard2-primary.cnf:ro
+    ports: ["33071:3306"]
+
+  mysql-s2-replica:
+    image: mysql:8.0
+    command: ["--defaults-file=/etc/mysql/conf.d/shard2-replica.cnf"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./cnf/shard2-replica.cnf:/etc/mysql/conf.d/shard2-replica.cnf:ro
+    ports: ["33072:3306"]
+
+  # ─── vttablets for Shard1 ───
+  vttablet-s1-primary:
+    image: vitess/vttablet:v20.0.4-bullseye
+    user: "1000:1000"
+    depends_on:
+      - mysql-s1-primary
+    entrypoint: ["/vt/bin/vttablet"]
+    command:
+      - --topo_implementation=zk2
+      - --topo_global_server_address=zk:2181
+      - --topo_global_root=/vitess/global
+      - --tablet-path=zone1-0000000100
+      - --init_keyspace=commerce
+      - --init_shard=-80
+      - --init_tablet_type=replica
+      - --port=15100
+      - --grpc_port=15200
+      - --db_host=mysql-s1-primary
+      - --db_port=3306
+      - --db_dba_user=root
+      - --db_dba_password=root
+      - --logtostderr
+
+  vttablet-s1-replica:
+    image: vitess/vttablet:v20.0.4-bullseye
+    user: "1000:1000"
+    depends_on:
+      - mysql-s1-replica
+    entrypoint: ["/vt/bin/vttablet"]
+    command:
+      - --topo_implementation=zk2
+      - --topo_global_server_address=zk:2181
+      - --topo_global_root=/vitess/global
+      - --tablet-path=zone1-0000000101
+      - --init_keyspace=commerce
+      - --init_shard=-80
+      - --init_tablet_type=replica
+      - --port=15101
+      - --grpc_port=15201
+      - --db_host=mysql-s1-replica
+      - --db_port=3306
+      - --db_dba_user=root
+      - --db_dba_password=root
+      - --logtostderr
+
+  vttablet-s2-primary:
+    image: vitess/vttablet:v20.0.4-bullseye
+    user: "1000:1000"
+    depends_on:
+      - mysql-s2-primary
+    entrypoint: ["/vt/bin/vttablet"]
+    command:
+      - --topo_implementation=zk2
+      - --topo_global_server_address=zk:2181
+      - --topo_global_root=/vitess/global
+      - --tablet-path=zone1-0000000200
+      - --init_keyspace=commerce
+      - --init_shard=80-
+      - --init_tablet_type=replica
+      - --port=15102
+      - --grpc_port=15202
+      - --db_host=mysql-s2-primary
+      - --db_port=3306
+      - --db_dba_user=root
+      - --db_dba_password=root
+      - --logtostderr
+
+  vttablet-s2-replica:
+    image: vitess/vttablet:v20.0.4-bullseye
+    user: "1000:1000"
+    depends_on:
+      - mysql-s2-replica
+    entrypoint: ["/vt/bin/vttablet"]
+    command:
+      - --topo_implementation=zk2
+      - --topo_global_server_address=zk:2181
+      - --topo_global_root=/vitess/global
+      - --tablet-path=zone1-0000000201
+      - --init_keyspace=commerce
+      - --init_shard=80-
+      - --init_tablet_type=replica
+      - --port=15103
+      - --grpc_port=15203
+      - --db_host=mysql-s2-replica
+      - --db_port=3306
+      - --db_dba_user=root
+      - --db_dba_password=root
+      - --logtostderr
+
+  # ─── Replication bootstrap ───
+  init-replication:
+    image: mysql:8.0
+    depends_on:
+      - mysql-s1-primary
+      - mysql-s1-replica
+      - mysql-s2-primary
+      - mysql-s2-replica
+    volumes:
+      - ./scripts/init-replication.sh:/init-replication.sh:ro
+    entrypoint: ["sh", "/init-replication.sh"]
