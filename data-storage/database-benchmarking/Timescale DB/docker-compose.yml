@@ -1,0 +1,25 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: iot
+    ports:
+      - "5433:5432"
+    volumes:
+      - tsdb_data:/var/lib/postgresql/data
+    command: >
+      postgres
+      -c shared_preload_libraries=timescaledb
+      -c max_locks_per_transaction=256
+      -c shared_buffers=2GB
+      -c effective_cache_size=4GB
+      -c work_mem=32MB
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_workers=8
+      -c wal_compression=on
+      -c log_statement=mod
+
+volumes:
+  tsdb_data:
