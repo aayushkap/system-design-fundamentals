@@ -42,10 +42,10 @@
 
 In this demo we will use sensor data as an example. The data will be generated using the Faker library, and inserted into the databases.
 
-- devices: id, name, location, status
-- sensors: id, device_id, type
-- sensor_readings: id, sensor_id, reading_time, reading_value
-- alerts: id, device_id, alert_time, alert_type, description
+- devices: id (UUID), name (String), location (String), status (String)
+- sensors: id (UUID), device_id (UUID), type (String)
+- sensor_readings: id (UUID), sensor_id (UUID), reading_time (Timestamp), reading_value (Double)
+- alerts: id (UUID), device_id (UUID), alert_time (Timestamp), alert_type (String), description (String)
 
 ## Test Queries
 

@@ -1,0 +1,38 @@
+# Java tuning - Reduced to fit 8GB RAM
+DRUID_XMX=2g
+DRUID_XMS=2g
+DRUID_MAXDIRECTMEMORYSIZE=3g
+
+DRUID_SINGLE_NODE_CONF=micro-quickstart
+
+druid_emitter_logging_logLevel=info
+
+druid_extensions_loadList=["druid-histogram", "druid-datasketches", "druid-lookups-cached-global", "postgresql-metadata-storage", "druid-multi-stage-query"]
+
+druid_zk_service_host=zookeeper
+
+druid_metadata_storage_host=
+druid_metadata_storage_type=postgresql
+druid_metadata_storage_connector_connectURI=jdbc:postgresql://postgres:5432/druid
+druid_metadata_storage_connector_user=druid
+druid_metadata_storage_connector_password=FoolishPassword
+
+druid_indexer_runner_javaOptsArray=["-server", "-Xmx2g", "-Xms2g", "-XX:MaxDirectMemorySize=3g", "-Duser.timezone=UTC", "-Dfile.encoding=UTF-8"]
+druid_indexer_fork_property_druid_processing_buffer_sizeBytes=512MiB  # The forked process needs a larger buffer size
+
+druid_storage_type=local
+druid_storage_storageDirectory=/opt/shared/segments
+druid_indexer_logs_type=file
+druid_indexer_logs_directory=/opt/shared/indexing-logs
+
+druid_processing_numThreads=6  # Matches 8 cores - 2 for OS
+druid_processing_numMergeBuffers=3  # Conservative setting
+
+druid_indexer_inputFormat_batchSize=50000  # Batch size for indexing tasks
+druid_processing_buffer_poolCacheMaxCount=500  # Limit cache size for processing buffers
+
+druid_worker_capacity=3  # Limit concurrent tasks
+druid_indexer_task_restoreTasksOnRestart=true # Allow task recovery
+druid_processing_buffer_sizeBytes=134217728  # 128 MiB
+
+DRUID_LOG4J=<?xml version="1.0" encoding="UTF-8" ?><Configuration status="WARN"><Appenders><Console name="Console" target="SYSTEM_OUT"><PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/></Console></Appenders><Loggers><Root level="warn"><AppenderRef ref="Console"/></Root></Loggers></Configuration>
