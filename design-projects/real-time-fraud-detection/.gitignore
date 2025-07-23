@@ -1,0 +1,11 @@
+# Python
+*.py[cod]
+__pycache__/
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+
+./data/*

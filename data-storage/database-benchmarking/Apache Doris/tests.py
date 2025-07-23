@@ -1,6 +1,6 @@
 import time
 from faker import Faker
-from clickhouse_client import ClickHouseClient
+from doris_client import DorisClient
 
 from datetime import datetime, timedelta
 import random
@@ -12,20 +12,19 @@ fake = Faker()
 def timed(fn, *args, **kwargs):
     start = time.perf_counter()
     res = fn(*args, **kwargs)
+
     end = time.perf_counter()
     return res, (end - start)
 
-print("Creating ClickHouse client and schema...")
-clickhouse_client = ClickHouseClient(batch_size=100000)
-clickhouse_client.create_schema()
-print("ClickHouse database and tables created:",
-      clickhouse_client.get_all_tables())
+print("Creating Doris client and schema...")
+doris_client = DorisClient(batch_size=50000)
+doris_client.create_schema()
 
 
 # ── CONFIG ──
 D = 10    # devices
 S = 10    # sensors per device
-R = 100000   # readings per sensor
+R = 10000   # readings per sensor
 A = 5    # alerts per device
 
 now = datetime.utcnow()
@@ -33,7 +32,6 @@ now = datetime.utcnow()
 # latency store
 
 def insert():
-    clickhouse_client.force_flush()
     start_time = time.perf_counter()
     for i in range(1, D+1):
         print(f"-> Device {i}/{D}")
@@ -42,7 +40,7 @@ def insert():
         st = random.choice(["online", "offline", "unknown"])
 
         device_id = uuid.uuid4()
-        _, t = timed(clickhouse_client.insert_device,
+        _, t = timed(doris_client.insert_device,
                      str(device_id), name, loc, st)
 
         for j in range(1, S+1):
@@ -50,7 +48,7 @@ def insert():
             typ = random.choice(["temp", "hum", "press"])
             sensor_id = uuid.uuid4()
 
-            _, t = timed(clickhouse_client.insert_sensor,
+            _, t = timed(doris_client.insert_sensor,
                          sensor_id, device_id, typ)
 
             for k in range(1, R+1):
@@ -59,31 +57,22 @@ def insert():
                 val = random.random() * 100
                 reading_id = uuid.uuid4()
 
-                _, t = timed(clickhouse_client.insert_reading,
-                             reading_id, sensor_id, device_id, val, tstamp)
+                _, t = timed(doris_client.bulk_insert_reading, reading_id, sensor_id, tstamp, val)
+
 
         for _ in range(A):
             tstamp = now - timedelta(hours=random.random()*24)
             atype = random.choice(["overheat", "disconnect", "low-battery"])
             desc = fake.sentence(nb_words=6)
             alert_id = uuid.uuid4()
-            clickhouse_client.insert_alert(
+            doris_client.insert_alert(
                 alert_id, device_id, atype, tstamp, desc)
 
-    clickhouse_client.force_flush()
+    doris_client.flush_readings()
+    doris_client.conn.commit()
+
     end_time = time.perf_counter()
     print(f"Data insertion completed in {end_time - start_time:.2f} seconds")
-
-def get_counts():
-    """
-    Get counts of records in each table and print them.
-    """
-    device_count = clickhouse_client.execute( query="SELECT COUNT(*) FROM devices" )[0][0]
-    sensor_count = clickhouse_client.execute( query="SELECT COUNT(*) FROM sensors" )[0][0]
-    reading_count = clickhouse_client.execute( query="SELECT COUNT(*) FROM sensor_readings" )[0][0]
-    alert_count = clickhouse_client.execute( query="SELECT COUNT(*) FROM alerts" )[0][0]
-
-    print(f"Devices: {device_count}, Sensors: {sensor_count}, Readings: {reading_count}, Alerts: {alert_count}")
 
 def execute_queries():
     """
@@ -94,15 +83,14 @@ def execute_queries():
     """
     print("Executing analytical queries...")
 
-    avg_readings, time = timed(clickhouse_client.get_avg_reading_per_device_per_day)
+    avg_readings, time = timed(doris_client.get_avg_reading_per_device_per_day)
     print(f"Average readings per device per day query executed in {time:.2f} seconds")
 
-    max_readings, time = timed(clickhouse_client.get_sensor_extremes_per_device)
+    max_readings, time = timed(doris_client.get_sensor_extremes_per_device)
     print(f"Max readings query executed in {time:.2f} seconds")
 
-    at, time = timed(clickhouse_client.get_avg_time_between_readings)
+    at, time = timed(doris_client.get_avg_time_between_readings)
     print(f"Average time between readings query executed in {time:.2f} seconds")
 
 insert()
-get_counts()
-execute_queries()
+# execute_queries()

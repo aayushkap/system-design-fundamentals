@@ -105,9 +105,3 @@ FROM time_diffs
 WHERE prev_time IS NOT NULL
 GROUP BY sensor_id;
 ```
-
-# Observations
-
-1. Cassandar - Took the most amount of memory and time to insert data. it is also the slowest on reads and no aggregations. It is not suitable for time-series data, as it does not support time-based partitioning or advanced time-series functions. It is slow on reads.
-
-2. Clickhouse - Easy to crash. Any failure during the insertions will result in a corrupted database. Only choice was to drop the table and recreate it.
