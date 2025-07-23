@@ -1,15 +1,8 @@
 # About the demo
 
-In this demo, we use synthetic IoT sensor data g## Summary Statistics
+In this demo, we use synthetic IoT sensor data generated to benchmark various databases. Scripts are provided to generate the data and perform the benchmarks.
 
-| Database                          | Insertion Time         | Query 1 Time | Query 2 Time    | Query 3 Time    |
-| --------------------------------- | ---------------------- | ------------ | --------------- | --------------- | -------------------------------------------------------------------------------------- |
-| [Apache Doris](./Apache%20Doris/) | \~89 s (1 M rows)      | \~0.06 s     | \~3.42 s        | \~0.43 s        |
-| [Apache Druid](./Apache%20Druid/) | \~780 s (10 M rows)    | \~20 s       | \~360 s (6 min) | \~180 s (3 min) |
-| [Cassandra](./Cassandra/)         |                        |              |                 |                 |
-| [ClickHouse](./Clickhouse/)       | \~89 s (10 M rows)     | \~0.06 s     | \~3.42 s        | \~0.43 s        |
-| [MongoDB](./Mongo/)               | \~157.16 s (10 M rows) | 27.94 s      | >300 s (>5 min) | \~30.28 s       |
-| [TimescaleDB](./Timescale%20DB/)  | \~56 s (1 M rows)      | 65 s         | 85 s            | 41 s            | ia the Faker library to benchmark various databases. The schema comprises four tables: |
+Schema:
 
 - **devices**: `id` (UUID), `name` (String), `location` (String), `status` (String)
 - **sensors**: `id` (UUID), `device_id` (UUID), `type` (String)
@@ -77,25 +70,25 @@ In this demo, we use synthetic IoT sensor data g## Summary Statistics
 
 ## Summary Statistics
 
-| Database     | Insertion Time         | Query 1 Time | Query 2 Time    | Query 3 Time    |
-| ------------ | ---------------------- | ------------ | --------------- | --------------- |
-| Apache Doris | \~89 s (1 M rows)      | \~0.06 s     | \~3.42 s        | \~0.43 s        |
-| Apache Druid | \~780 s (10 M rows)    | \~20 s       | \~360 s (6 min) | \~180 s (3 min) |
-| Cassandra    |                        |              |                 |                 |
-| ClickHouse   | \~89 s (10 M rows)     | \~0.06 s     | \~3.42 s        | \~0.43 s        |
-| MongoDB      | \~157.16 s (10 M rows) | 27.94 s      | >300 s (>5 min) | \~30.28 s       |
-| TimescaleDB  | \~56 s (1 M rows)      | 65 s         | 85 s            | 41 s            |
+| Database                          | Insertion Time         | Query 1 Time | Query 2 Time    | Query 3 Time    |
+| --------------------------------- | ---------------------- | ------------ | --------------- | --------------- |
+| [Apache Doris](./Apache%20Doris/) | \~89 s (1 M rows)      | \~0.06 s     | \~3.42 s        | \~0.43 s        |
+| [Apache Druid](./Apache%20Druid/) | \~780 s (10 M rows)    | \~20 s       | \~360 s (6 min) | \~180 s (3 min) |
+| [Cassandra](./Cassandra/)         |                        |              |                 |                 |
+| [ClickHouse](./Clickhouse/)       | \~89 s (10 M rows)     | \~0.06 s     | \~3.42 s        | \~0.43 s        |
+| [MongoDB](./Mongo/)               | \~157.16 s (10 M rows) | 27.94 s      | >300 s (>5 min) | \~30.28 s       |
+| [TimescaleDB](./Timescale%20DB/)  | \~56 s (1 M rows)      | 65 s         | 85 s            | 41 s            |
 
-## Detailed Results & Observations
+## Table of Contents
 
-### [Apache Doris](./Apache%20Doris/)
+#### [Apache Doris](./Apache%20Doris/)
 
-### [Apache Druid](./Apache%20Druid/)
+#### [Apache Druid](./Apache%20Druid/)
 
-### [Cassandra](./Cassandra/)
+#### [Cassandra](./Cassandra/)
 
-### [ClickHouse](./Clickhouse/)
+#### [ClickHouse](./Clickhouse/)
 
-### [MongoDB](./Mongo/)
+#### [MongoDB](./Mongo/)
 
-### [TimescaleDB](./Timescale%20DB/)
+#### [TimescaleDB](./Timescale%20DB/)
