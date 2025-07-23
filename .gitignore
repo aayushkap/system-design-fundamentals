@@ -22,3 +22,8 @@ venv/
 # MacOS and system files
 .DS_Store
 Thumbs.db
+
+# Data folders and their contents
+data/
+**/data/
+*/data/*
