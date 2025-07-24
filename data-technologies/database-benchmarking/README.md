@@ -72,9 +72,9 @@ Schema:
 
 | Database                          | Insertion Time         | Query 1 Time | Query 2 Time    | Query 3 Time    |
 | --------------------------------- | ---------------------- | ------------ | --------------- | --------------- |
-| [Apache Doris](./Apache%20Doris/) | \~89 s (1 M rows)      | \~0.06 s     | \~3.42 s        | \~0.43 s        |
+| [Apache Doris](./Apache%20Doris/) | \~243.9 s (1 M rows)   | \~0.22 s     | \0.1 s          | \~0.44 s        |
 | [Apache Druid](./Apache%20Druid/) | \~780 s (10 M rows)    | \~20 s       | \~360 s (6 min) | \~180 s (3 min) |
-| [Cassandra](./Cassandra/)         |                        |              |                 |                 |
+| [Cassandra](./Cassandra/)         | \~180 s (10 M rows)    | N/A          | N/A             | N/A             |
 | [ClickHouse](./Clickhouse/)       | \~89 s (10 M rows)     | \~0.06 s     | \~3.42 s        | \~0.43 s        |
 | [MongoDB](./Mongo/)               | \~157.16 s (10 M rows) | 27.94 s      | >300 s (>5 min) | \~30.28 s       |
 | [TimescaleDB](./Timescale%20DB/)  | \~56 s (1 M rows)      | 65 s         | 85 s            | 41 s            |
