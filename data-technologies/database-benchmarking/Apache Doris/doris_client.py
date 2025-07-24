@@ -117,7 +117,7 @@ class DorisClient:
         GROUP BY s.device_id, day
         ORDER BY s.device_id, day;
         """
-        return self.doris_to_df(query)
+        return self.execute(query)
 
     def get_sensor_extremes_per_device(self):
         query = """
@@ -131,7 +131,7 @@ class DorisClient:
         GROUP BY s.device_id, s.id
         ORDER BY s.device_id, s.id;
         """
-        return self.doris_to_df(query)
+        return self.execute(query)
 
     def get_avg_time_between_readings(self):
         query = """
@@ -150,4 +150,4 @@ class DorisClient:
         WHERE diff_seconds IS NOT NULL
         GROUP BY sensor_id;
         """
-        return self.doris_to_df(query)
+        return self.execute(query)

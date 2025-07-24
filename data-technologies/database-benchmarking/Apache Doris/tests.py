@@ -17,7 +17,7 @@ def timed(fn, *args, **kwargs):
     return res, (end - start)
 
 print("Creating Doris client and schema...")
-doris_client = DorisClient(batch_size=50000)
+doris_client = DorisClient(batch_size=10000)
 doris_client.create_schema()
 
 
@@ -92,5 +92,5 @@ def execute_queries():
     at, time = timed(doris_client.get_avg_time_between_readings)
     print(f"Average time between readings query executed in {time:.2f} seconds")
 
-insert()
-# execute_queries()
+# insert()
+execute_queries()

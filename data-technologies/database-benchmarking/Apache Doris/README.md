@@ -10,13 +10,15 @@
 
 ### Results:
 
-- **Insertion**: 10,00,000 rows in `~89 seconds` (with batch-inserts of 100,000).
-- **Query 1**: Average readings per device per day in `~0.06 seconds`.
-- **Query 2**: Max readings per device in `~3.42 seconds`.
-- **Query 3**: Average time between readings in `~0.43 seconds`.
+- **Insertion**: 1,000,000 rows in `~243.9 seconds` (with batch-inserts of 10,000).
+- **Query 1**: Average readings per device per day in `~0.22 seconds`.
+- **Query 2**: Max readings per device in `~0.10 seconds`.
+- **Query 3**: Average time between readings in `~0.45 seconds`.
 
 ### Observations:
 
 - Much more resource intensive than other databases, especially during the initial data load. It requires a lot of memory and CPU resources to perform optimally, unlike ClickHouse which was much more performant on the same hardware.
 
-- Slow on bulk inserts.
+- Slow on bulk inserts. Which tracks since it is optimized for analytical queries rather than high-speed data ingestion.
+
+- Blazing fast on analytical queries. On 1 million rows, it was able to return results in sub-second times for all queries.
