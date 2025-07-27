@@ -27,3 +27,7 @@ Thumbs.db
 data/
 **/data/
 */data/*
+
+mlruns/
+**/mlruns/
+*/mlruns/*
