@@ -13,4 +13,4 @@ def print_tree(startpath, ignore_dirs=None, level=0, max_depth=3):
         else:
             print("    " * level + f"📄 {item}")
 
-print_tree("./design-projects/micro-services-with-open-telemetry", ignore_dirs={"venv", "__pycache__", ".git"}, max_depth=3)
+print_tree("./design-projects/distributed-tracing-with-open-telemetry", ignore_dirs={"venv", "__pycache__", ".git"}, max_depth=3)

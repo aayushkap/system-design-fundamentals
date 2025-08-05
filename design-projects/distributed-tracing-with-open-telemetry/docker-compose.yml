@@ -19,7 +19,9 @@ services:
       - "5432:5432"
 
   gateway:
-    build: ./gateway
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
     environment:
       - OTEL_SERVICE_NAME=gateway
       - OTEL_COLLECTOR_URL=http://collector:4318
@@ -33,7 +35,9 @@ services:
       - "8000:8000"
 
   processor-1:
-    build: ./processor
+    build:
+      context: .
+      dockerfile: processor/Dockerfile
     environment:
       - OTEL_SERVICE_NAME=processor-1
       - OTEL_COLLECTOR_URL=http://collector:4318
@@ -45,7 +49,9 @@ services:
       - "8001:8001"
 
   processor-2:
-    build: ./processor
+    build:
+      context: .
+      dockerfile: processor/Dockerfile
     environment:
       - OTEL_SERVICE_NAME=processor-2
       - OTEL_COLLECTOR_URL=http://collector:4318

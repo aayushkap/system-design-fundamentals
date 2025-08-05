@@ -6,23 +6,14 @@ Context propagation is the mechanism by which trace context (like trace IDs and 
 
 ## About this project
 
+![](./Architecture.png)
+
 This project demonstrates distributed tracing and observability across microservices using **OpenTelemetry**, **Zipkin**, **Prometheus**, and **Grafana**.
-
-### Span structure
-
-[Client Root Span]
-│
-[Gateway Span]
-│
-[Processor Span] x2
-│
-[Database Span]
 
 - A gateway service receives incoming requests and forwards them to one of two processor services.
 - Each processor service handles the request and interacts with a database.
 - Processors may randomly throw errors to simulate failure scenarios.
 - All services are instrumented to export tracing and metrics data.
-
 
 ## Endpoints
 
@@ -30,7 +21,6 @@ This project demonstrates distributed tracing and observability across microserv
 - **Gateway Swagger UI:** [http://localhost:8000/docs#/default/proxy_proxy_get](http://localhost:8000/docs#/default/proxy_proxy_get)
 - **Prometheus Metrics:** [http://localhost:8889/metrics](http://localhost:8889/metrics)
 - **Prometheus Targets:** [http://localhost:9090/targets](http://localhost:9090/targets)
-
 
 ## Stack
 
@@ -40,7 +30,6 @@ This project demonstrates distributed tracing and observability across microserv
 - Prometheus (Metrics backend)
 - Grafana (Metrics visualization)
 - Docker Compose
-
 
 ## Running the project
 
