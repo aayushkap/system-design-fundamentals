@@ -14,7 +14,7 @@
 ---
 
 - By default, Citus creates **32 shards** per distributed table.  
-  These shards are logical partitions of a table, distributed evenly across worker nodes.
+  These shards are logical partitions of a table, distributed evenly across worker nodes. Each shard is a table in PostgreSQL, and Citus manages the distribution of data across these shards.
 
 - In this demo, the number of shards is set to **4** in the `init.sql` file for easier visualization of data distribution.
 
@@ -41,6 +41,11 @@
                              │
             replicated copies│ if we set `replication_factor`
 ```
+
+- Since we have 4 shards and 2 workers, each worker will hold 2 shards. It is a full replication.
+
+- Citus is **not a high-availability (HA) system** out-of-the-box. Meaning on failure, it does not automatically promote a replica to a primary.  
+  
 
 ---
 
@@ -87,4 +92,24 @@ FROM run_command_on_shards('sensor_data', 'SELECT count(*) FROM %s') r
 JOIN citus_shards cs ON r.shardid = cs.shardid
 WHERE cs.table_name = 'sensor_data'::regclass AND r.success = true
 ORDER BY cs.shard_name;
+```
+
+* Schema Per Shard: *
+
+```sql
+SELECT *
+FROM run_command_on_shards(
+  'sensor_data',
+  $$
+    SELECT
+      array_agg(
+        column_name || ' | ' || data_type
+        ORDER BY ordinal_position
+      ) AS column_defs
+    FROM information_schema.columns
+    WHERE table_name = '%1$s'
+  $$,
+  TRUE  -- include node_name + shard_id in the output
+);
+
 ```

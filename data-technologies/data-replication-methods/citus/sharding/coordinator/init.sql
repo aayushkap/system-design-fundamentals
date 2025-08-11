@@ -7,7 +7,7 @@ SELECT citus_add_node('citus-worker1', 5432);
 SELECT citus_add_node('citus-worker2', 5432);
 
 SET citus.shard_count = 4; -- Number of shards to 4, across all workers
-SET citus.shard_replication_factor = 2; -- Replication factor to 1, meaning no replication across workers
+SET citus.shard_replication_factor = 2; -- Replication factor to 2, meaning 1 replica across workers
 
 -- Create distributed table
 DROP TABLE IF EXISTS sensor_data;
