@@ -1,1 +1,1 @@
-Exploration of various System Design Tools & Patterns.
+A collection of experiments, benchmarks, and projects exploring system design tools, architectures, and patterns.

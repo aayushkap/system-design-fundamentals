@@ -9,3 +9,5 @@ build/
 *.whl
 
 ./data/*
+
+*/mlflow_store/*

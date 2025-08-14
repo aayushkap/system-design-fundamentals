@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  mlflow-server:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow-server
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow/mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
+    volumes:
+      - ./Model Registry/mlflow_store:/mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+
+  trainer:
+    build:
+      context: ./Continuous Training Service
+      dockerfile: Dockerfile
+    container_name: trainer
+    working_dir: /app
+    volumes:
+      - ./Continuous Training Service:/app
+      - ./Model Registry/mlflow_store:/mlflow  # so logs go to same store
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+      - MLFLOW_EXPERIMENT_NAME=fraud_detection_experiment
+    depends_on:
+      - mlflow-server
+    command: python mlflow_train_test.py

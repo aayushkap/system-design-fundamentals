@@ -5,6 +5,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, classification_report, confusion_matrix
 import mlflow
 import mlflow.lightgbm
+import os
+import tempfile
+
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
+mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME"))
 
 # Constants declaration
 RISKY_DOMAINS = ["protonmail.com", "mail.ru", "yandex.ru", "tutanota.com"]
@@ -24,36 +29,37 @@ POTENTIAL_FEATURES = [
     "addr2",
     "dist1",
     "dist2",
-    "C1",
-    "C2",
-    "C4",
-    "C5",
-    "C6",
-    "C11",
-    "C12",
-    "C13",
-    "C14",
-    "D1",
-    "D2",
-    "D10",
-    "D15",
-    "V281",
-    "V282",
-    "V283",
-    "V284",
-    "V285",
-    "V286",
-    "V287",
+    # "C1",
+    # "C2",
+    # "C4",
+    # "C5",
+    # "C6",
+    # "C11",
+    # "C12",
+    # "C13",
+    # "C14",
+    # "D1",
+    # "D2",
+    # "D10",
+    # "D15",
+    # "V281",
+    # "V282",
+    # "V283",
+    # "V284",
+    # "V285",
+    # "V286",
+    # "V287",
 ]
 
 
 def load_data():
     """Load and merge transaction and identity datasets"""
     print("Loading data...")
-    train_trans = pd.read_csv("../data/train_transaction.csv")
-    train_id = pd.read_csv("../data/train_identity.csv")
-    test_trans = pd.read_csv("../data/test_transaction.csv")
-    test_id = pd.read_csv("../data/test_identity.csv")
+    print(f"Currrent Directory: {os.getcwd()}")
+    train_trans = pd.read_csv("./data/train_transaction.csv")
+    train_id = pd.read_csv("./data/train_identity.csv")
+    test_trans = pd.read_csv("./data/test_transaction.csv")
+    test_id = pd.read_csv("./data/test_identity.csv")
 
     train = pd.merge(train_trans, train_id, on="TransactionID", how="left")
     test = pd.merge(test_trans, test_id, on="TransactionID", how="left")
@@ -205,7 +211,7 @@ def train_and_evaluate(X_train, y_train, X_val, y_val):
     report = classification_report(y_val, y_pred, output_dict=True)
     cm = confusion_matrix(y_val, y_pred)
 
-    return model, auc, report, cm
+    return model, auc, report, cm, params
 
 
 def log_results(model, auc, report, cm):
@@ -216,21 +222,20 @@ def log_results(model, auc, report, cm):
     mlflow.log_metric("f1_score", report["1"]["f1-score"])
 
     # Log confusion matrix
-    cm_df = pd.DataFrame(
-        cm, index=["actual_0", "actual_1"], columns=["pred_0", "pred_1"]
-    )
-    cm_csv = "confusion_matrix.csv"
-    cm_df.to_csv(cm_csv)
-    mlflow.log_artifact(cm_csv)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        cm_df = pd.DataFrame(
+            cm,
+            index=["actual_0", "actual_1"],
+            columns=["pred_0", "pred_1"]
+        )
+        cm_csv = os.path.join(tmpdir, "confusion_matrix.csv")
+        cm_df.to_csv(cm_csv)
+        mlflow.log_artifact(cm_csv, artifact_path="metrics")
 
-    # Log model
-    mlflow.lightgbm.log_model(model, artifact_path="model")
-    print(f"Logged run: {mlflow.active_run().info.run_id}")
 
 
 def orchestrate():
     """Main orchestration function for the ML pipeline"""
-    mlflow.set_experiment("fraud_detection_experiment")
 
     # Data pipeline
     train, test = load_data()
@@ -240,18 +245,17 @@ def orchestrate():
     X_train, X_val, y_train, y_val = prepare_data(train)
 
     # Model pipeline
-    with mlflow.start_run(run_name="lightgbm_fraud_run"):
+    with mlflow.start_run(run_name=os.getenv("MLFLOW_EXPERIMENT_NAME")):
+        model, auc, report, cm, params = train_and_evaluate(X_train, y_train, X_val, y_val)
         mlflow.log_params(
             {
                 "test_size": 0.2,
-                "random_state": 42,
+                "random_state": params.get("random_state"),
                 "features_used": len(
                     [f for f in POTENTIAL_FEATURES if f in train.columns]
                 ),
             }
         )
-
-        model, auc, report, cm = train_and_evaluate(X_train, y_train, X_val, y_val)
         log_results(model, auc, report, cm)
 
     print("Pipeline executed successfully!")
