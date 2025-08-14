@@ -1,0 +1,49 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  haproxy:
+    image: haproxy:2.8-alpine
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "80:80"
+      - "81:81"
+      - "1936:1936"
+    depends_on:
+      - app1
+      - app2
+      - app3
+    networks:
+      - web
+
+  app1:
+    build:
+      context: ./app
+    environment:
+      - INSTANCE=app1
+      - SERVER=gunicorn
+    networks:
+      - web
+
+  app2:
+    build:
+      context: ./app
+    environment:
+      - INSTANCE=app2
+      - SERVER=gunicorn
+    networks:
+      - web
+
+  app3:
+    build:
+      context: ./app
+    environment:
+      - INSTANCE=app3
+      - SERVER=gunicorn
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge

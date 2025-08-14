@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "./traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./traefik/acme.json:/acme.json"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - web
+
+  app1:
+    build: ./app
+    labels:
+      - "traefik.enable=true"
+      # BOTH containers share this router name "app":
+      - "traefik.http.routers.app.rule=Host(`localhost`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      # BOTH containers advertise the SAME service name "app":
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+    networks:
+      - web
+
+  app2:
+    build: ./app
+    labels:
+      - "traefik.enable=true"
+      # same router name "app"
+      - "traefik.http.routers.app.rule=Host(`localhost`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      # same service name "app"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
