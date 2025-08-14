@@ -78,6 +78,7 @@ Schema:
 | [ClickHouse](./Clickhouse/)       | \~89 s (10 M rows)     | \~0.06 s     | \~3.42 s        | \~0.43 s        |
 | [MongoDB](./Mongo/)               | \~157.16 s (10 M rows) | 27.94 s      | >300 s (>5 min) | \~30.28 s       |
 | [TimescaleDB](./Timescale%20DB/)  | \~56 s (1 M rows)      | 65 s         | 85 s            | 41 s            |
+| [InfluxDB 2](./Influx%20DB%202/) | \~189 s (10 M rows)    | ~0.09 s      | \~1.15 s        | \~2.68 s        |
 
 ## Table of Contents
 
@@ -92,3 +93,5 @@ Schema:
 #### [MongoDB](./Mongo/)
 
 #### [TimescaleDB](./Timescale%20DB/)
+
+#### [InfluxDB 2](./Influx%20DB%202/)
