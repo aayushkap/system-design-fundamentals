@@ -1,0 +1,162 @@
+# 2 Shards, each one has 3 members (1 Primary, 2 Secondaries). These get selected randomly.
+# Hence, in total, we have 6 MongoDB nodes.
+# Together these form a sharded cluster.
+
+
+version: "3.9"
+
+x-mongo-image: &mongo_image mongo:7.0
+
+networks:
+  mongonet:
+    driver: bridge
+
+volumes:
+  cfg1: {}
+  cfg2: {}
+  cfg3: {}
+  s1a: {}
+  s1b: {}
+  s1c: {}
+  s2a: {}
+  s2b: {}
+  s2c: {}
+
+services:
+  cfg1:
+    image: *mongo_image
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [cfg1:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27019"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  cfg2:
+    image: *mongo_image
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [cfg2:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27019"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  cfg3:
+    image: *mongo_image
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [cfg3:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27019"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  shard1a:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard1RS", "--port", "27018", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [s1a:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27018"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  shard1b:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard1RS", "--port", "27018", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [s1b:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27018"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  shard1c:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard1RS", "--port", "27018", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [s1c:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27018"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  shard2a:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard2RS", "--port", "27018", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [s2a:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27018"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  shard2b:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard2RS", "--port", "27018", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [s2b:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27018"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+
+  shard2c:
+    image: *mongo_image
+    command: ["mongod", "--shardsvr", "--replSet", "shard2RS", "--port", "27018", "--bind_ip_all"]
+    networks: [mongonet]
+    volumes: [s2c:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })", "--port", "27018"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+
+  mongos:
+    image: *mongo_image
+    depends_on:
+      cfg1: { condition: service_healthy }
+      cfg2: { condition: service_healthy }
+      cfg3: { condition: service_healthy }
+    command: [
+      "mongos",
+      "--configdb", "cfgRS/cfg1:27019,cfg2:27019,cfg3:27019",
+      "--bind_ip_all",
+      "--port", "27017"
+    ]
+    ports:
+      - "27017:27017"
+    networks: [mongonet]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--host", "localhost", "--port", "27017", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+
+  init:
+    image: *mongo_image
+    depends_on:
+      mongos: { condition: service_healthy }
+      shard1a: { condition: service_healthy }
+      shard1b: { condition: service_healthy }
+      shard1c: { condition: service_healthy }
+      shard2a: { condition: service_healthy }
+      shard2b: { condition: service_healthy }
+      shard2c: { condition: service_healthy }
+    networks: [mongonet]
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["bash", "/scripts/init-all.sh"]
