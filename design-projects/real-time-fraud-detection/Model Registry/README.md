@@ -25,7 +25,7 @@ In gradient boosting, we use `gradient descent` to minimize the loss function, w
    - We perform frequency encoding on the transaction email domains to capture the frequency of each domain in the dataset. It is logical that domains with more transactions are more likely to be legitimate.
    - We have a list of risky email domains that are known to be associated with fraud. We create a binary feature `RiskyDomain` to indicate whether the transaction email domain is in this list.
 
-[Feature Importance](./Figure_1.png) shows the importance of each feature in the model.The number against each features tells us the number of times the feature was used to split the data across all trees in the model. Higher values indicate more important features.
+[Feature Importance](./extra/Figure_1.png) shows the importance of each feature in the model.The number against each features tells us the number of times the feature was used to split the data across all trees in the model. Higher values indicate more important features.
 
 3. **Model Training**: We define some basic parameters for the LightGBM model.
    - The dataset is highly imbalanced, so we use the `AUC` (Area Under the ROC Curve) metric to evaluate the model's performance. This metric tells us the model's ability to distinguish between the positive class (fraud) and the negative class (non-fraud).
