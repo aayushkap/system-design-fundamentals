@@ -7,6 +7,7 @@ import mlflow
 import mlflow.lightgbm
 import os
 import tempfile
+import matplotlib.pyplot as plt
 
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME"))
@@ -21,7 +22,7 @@ POTENTIAL_FEATURES = [
     "TxCount_24h",
     "RiskyEmail",
     "TimeSinceLastTx",
-    "card1",
+    # "card1", # Removed as this is card identifier.
     "card2",
     "card3",
     "card5",
@@ -223,43 +224,53 @@ def log_results(model, auc, report, cm):
 
     # Log confusion matrix
     with tempfile.TemporaryDirectory() as tmpdir:
+        # Save confusion matrix
         cm_df = pd.DataFrame(
-            cm,
-            index=["actual_0", "actual_1"],
-            columns=["pred_0", "pred_1"]
+            cm, index=["actual_0", "actual_1"], columns=["pred_0", "pred_1"]
         )
         cm_csv = os.path.join(tmpdir, "confusion_matrix.csv")
         cm_df.to_csv(cm_csv)
         mlflow.log_artifact(cm_csv, artifact_path="metrics")
+        
+        # Save the model
+        mlflow.lightgbm.log_model(model, artifact_path="model")
+
+        # Save feature importance plot
+        fig, ax = plt.subplots(figsize=(10, 6))
+        lgb.plot_importance(model, max_num_features=20, ax=ax)
+        fi_path = os.path.join(tmpdir, "feature_importance.png")
+        plt.savefig(fi_path)
+        plt.close(fig)
+        mlflow.log_artifact(fi_path, artifact_path="artifacts")
 
 
-
-def orchestrate():
+def train_and_test():
     """Main orchestration function for the ML pipeline"""
+    try:
+        # Data pipeline
+        train, test = load_data()
+        train = handle_missing(train, KEY_COLUMNS)
+        test = handle_missing(test, KEY_COLUMNS)
+        train, test = engineer_features(train, test)
+        X_train, X_val, y_train, y_val = prepare_data(train)
 
-    # Data pipeline
-    train, test = load_data()
-    train = handle_missing(train, KEY_COLUMNS)
-    test = handle_missing(test, KEY_COLUMNS)
-    train, test = engineer_features(train, test)
-    X_train, X_val, y_train, y_val = prepare_data(train)
+        # Model pipeline
+        with mlflow.start_run(run_name=os.getenv("MLFLOW_EXPERIMENT_NAME")):
+            model, auc, report, cm, params = train_and_evaluate(
+                X_train, y_train, X_val, y_val
+            )
+            mlflow.log_params(
+                {
+                    "test_size": 0.2,
+                    "random_state": params.get("random_state"),
+                    "features_used": len(
+                        [f for f in POTENTIAL_FEATURES if f in train.columns]
+                    ),
+                }
+            )
+            log_results(model, auc, report, cm)
 
-    # Model pipeline
-    with mlflow.start_run(run_name=os.getenv("MLFLOW_EXPERIMENT_NAME")):
-        model, auc, report, cm, params = train_and_evaluate(X_train, y_train, X_val, y_val)
-        mlflow.log_params(
-            {
-                "test_size": 0.2,
-                "random_state": params.get("random_state"),
-                "features_used": len(
-                    [f for f in POTENTIAL_FEATURES if f in train.columns]
-                ),
-            }
-        )
-        log_results(model, auc, report, cm)
-
-    print("Pipeline executed successfully!")
-
-
-if __name__ == "__main__":
-    orchestrate()
+            return True, mlflow.active_run().info.run_id
+    except Exception as e:
+        print(f"Error during training and testing: {e}")
+        return False, None

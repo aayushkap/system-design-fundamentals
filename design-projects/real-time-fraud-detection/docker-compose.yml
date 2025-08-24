@@ -32,4 +32,4 @@ services:
       - MLFLOW_EXPERIMENT_NAME=fraud_detection_experiment
     depends_on:
       - mlflow-server
-    command: python mlflow_train_test.py
+    command: python orchestrator.py

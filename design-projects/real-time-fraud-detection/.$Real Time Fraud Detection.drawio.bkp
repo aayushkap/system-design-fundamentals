@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9">
   <diagram name="Page-1" id="lOX2KXedeWFzTWIlUK9F">
-    <mxGraphModel dx="4869" dy="1944" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2860" dy="2148" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -96,7 +96,7 @@
         <mxCell id="d66PIv0IayiopUPnUm3M-25" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://images.seeklogo.com/logo-png/42/1/fastapi-logo-png_seeklogo-425420.png;" parent="1" vertex="1">
           <mxGeometry x="-314" y="785.18" width="115" height="115" as="geometry" />
         </mxCell>
-        <mxCell id="TBy8B3cu2z9gyoGo7kFR-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="ZFdYl1KIuNtdTHQt-psF-1" target="TBy8B3cu2z9gyoGo7kFR-19" edge="1">
+        <mxCell id="TBy8B3cu2z9gyoGo7kFR-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="d66PIv0IayiopUPnUm3M-27" target="TBy8B3cu2z9gyoGo7kFR-19" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="d66PIv0IayiopUPnUm3M-27" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://images.seeklogo.com/logo-png/42/1/fastapi-logo-png_seeklogo-425420.png;" parent="1" vertex="1">
@@ -175,7 +175,7 @@
           <mxGeometry x="-155" y="1070" width="109" height="122.54" as="geometry" />
         </mxCell>
         <mxCell id="TRtpWzJa2Ii4a0pyKc41-23" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiMVVYYgj_LY437FrV-KwNX9-rul33uYnRtgbk40J4GlNG29dkWyvnbtGgyBfrUqGW6e4hhbNO-WxGcOXNltbDyXDjpkCcugy0HcMxIYxBFCuQOKkMx8P2oIcL1D-hSYcZig4sGTkiFwG4/s1600/opentelemetry-stacked-color.png;" parent="1" vertex="1">
-          <mxGeometry x="850" y="1179.8300000000002" width="230" height="134.55" as="geometry" />
+          <mxGeometry x="795" y="1185.45" width="230" height="134.55" as="geometry" />
         </mxCell>
         <mxCell id="TRtpWzJa2Ii4a0pyKc41-25" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;Transaction Log Manager&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" parent="1" vertex="1">
           <mxGeometry x="-170" y="1021" width="139" height="40" as="geometry" />
@@ -351,15 +351,6 @@
         </mxCell>
         <mxCell id="uOGz96gBhH0Yf_m4leUT-5" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/d/de/AirflowLogo.png;" parent="1" vertex="1">
           <mxGeometry x="1400" y="1800" width="196.86" height="76.12" as="geometry" />
-        </mxCell>
-        <mxCell id="ZFdYl1KIuNtdTHQt-psF-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="d66PIv0IayiopUPnUm3M-27" target="ZFdYl1KIuNtdTHQt-psF-1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="-199" y="633" as="sourcePoint" />
-            <mxPoint x="-175" y="843" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="ZFdYl1KIuNtdTHQt-psF-1" value="" style="shape=waypoint;sketch=0;size=6;pointerEvents=1;points=[];fillColor=default;resizable=0;rotatable=0;perimeter=centerPerimeter;snapToPoint=1;verticalAlign=top;labelBackgroundColor=default;" vertex="1" parent="1">
-          <mxGeometry x="-185" y="622.68" width="20" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
