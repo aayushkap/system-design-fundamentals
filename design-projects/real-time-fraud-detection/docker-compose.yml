@@ -18,18 +18,26 @@ services:
       --backend-store-uri sqlite:///mlflow/mlflow.db
       --default-artifact-root /mlflow/artifacts
 
-  trainer:
+  # trainer:
+  #   build:
+  #     context: ./Continuous Training Service
+  #     dockerfile: Dockerfile
+  #   container_name: trainer
+  #   working_dir: /app
+  #   volumes:
+  #     - ./Continuous Training Service:/app
+  #     - ./Model Registry/mlflow_store:/mlflow # so logs go to same store
+  #   environment:
+  #     - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+  #     - MLFLOW_EXPERIMENT_NAME=fraud_detection_experiment
+  #   depends_on:
+  #     - mlflow-server
+  #   command: python orchestrator.py
+
+  orchestrator-instance:
     build:
-      context: ./Continuous Training Service
+      context: ./Request Orchestrator
       dockerfile: Dockerfile
-    container_name: trainer
-    working_dir: /app
-    volumes:
-      - ./Continuous Training Service:/app
-      - ./Model Registry/mlflow_store:/mlflow  # so logs go to same store
-    environment:
-      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
-      - MLFLOW_EXPERIMENT_NAME=fraud_detection_experiment
-    depends_on:
-      - mlflow-server
-    command: python orchestrator.py
+    container_name: orchestrator-instance
+    ports:
+      - "8080:8080"

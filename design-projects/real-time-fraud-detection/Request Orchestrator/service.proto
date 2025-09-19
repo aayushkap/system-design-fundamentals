@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package generator;
+
+// The request is empty; the server generates some data
+message GenerateRequest {}
+
+message GenerateResponse {
+    string message = 1;
+    int32 value = 2;
+}
+
+// Service definition
+service Generator {
+    rpc Generate(GenerateRequest) returns (GenerateResponse);
+}

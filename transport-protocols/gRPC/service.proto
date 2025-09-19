@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package myservice;
+
+// The service definition
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply) {}   // RPC method
+}
+
+// The request message
+message HelloRequest {
+  string name = 1; // Each field has a type and a unique number tag
+  int32 employee_id = 2;
+}
+
+// The response message
+message HelloReply {
+  string message = 1;
+}
+
+
+// For Streaming
+service ChatService {
+  // Server streaming: client sends 1 message, server streams multiple messages
+  rpc ServerStream (ChatRequest) returns (stream ChatReply) {}
+
+  // Client streaming: client streams multiple messages, server responds once
+  rpc ClientStream (stream ChatRequest) returns (ChatReply) {}
+
+  // Bidirectional streaming: both client and server stream messages
+  rpc BidirectionalStream (stream ChatRequest) returns (stream ChatReply) {}
+}
+
+message ChatRequest {
+  string message = 1;
+}
+
+message ChatReply {
+  string message = 1;
+}
