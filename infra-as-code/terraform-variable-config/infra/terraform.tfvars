@@ -14,9 +14,4 @@ backend_servers = {
     environment   = "production"
     log_level     = "warning"
   }
-  "server-4" = {
-   external_port = 8004
-   environment   = "staging"
-   log_level     = "info"
- }
 }
