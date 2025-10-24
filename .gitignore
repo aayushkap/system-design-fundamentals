@@ -31,3 +31,17 @@ data/
 mlruns/
 **/mlruns/
 */mlruns/*
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+*.tfplan
+.terraformrc
+terraform.rc
